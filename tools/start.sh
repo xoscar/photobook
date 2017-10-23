@@ -1,3 +1,6 @@
+echo `instaling global dependencies`;
+yarn global pm2 grunt sails
+
 echo `instaling dependencies`;
 
 cd src && yarn;
