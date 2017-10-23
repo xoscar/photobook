@@ -1,0 +1,28 @@
+{
+  "name": "phonebook",
+  "version": "0.0.1",
+  "description": "test phonebook",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "npm t"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "phonebook",
+    "test",
+    "node.js",
+    "sails"
+  ],
+  "author": "Oscar R. Reyes",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-security": "^1.4.0"
+  }
+}

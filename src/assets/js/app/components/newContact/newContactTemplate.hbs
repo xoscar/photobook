@@ -1,0 +1,50 @@
+<a class="btn btn-success new-contact-button pointer text-light" data-toggle="modal" data-target="#newModal" role="button" aria-pressed="true">New</a>
+
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+	<form class="new-user-form">
+	  <div class="modal-dialog modal-lg" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="newModalLabel">Contact detail view</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span class="pointer" aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row text-left">
+		        <div class="col-sm-12">
+						  <div class="form-group">
+						    <label for="name">Name</label>
+						    <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
+						  </div>
+						  <div class="form-group">
+						    <label for="email">Email</label>
+						    <input type="email" class="form-control" id="email" name="email" placeholder="foo@bar.com">
+						  </div>
+						  <div class="form-group">
+						    <label for="phone">Phone</label>
+						    <input type="text" class="form-control" id="phone" name="phone" placeholder="+52 0123...">
+						  </div>
+						  <div class="form-group">
+						    <label for="address">Address</label>
+						    <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+						  </div>
+						  <div class="form-group">
+						    <label for="details">Details</label>
+						    <textarea class="form-control" id="details" name="details" rows="3"></textarea>
+						  </div>
+						  <div class="form-group">
+						    <label for="image">Contact image</label>
+						    <input type="file" class="form-control-file" id="image" name="image">
+						  </div>
+						</div>
+					</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn pointer btn-secondary" data-dismiss="modal">Close</button>
+	        <button type="submit" class="btn btn-primary">Add</button>
+	      </div>
+    	</div>
+  	</div>
+  </form>
+</div>
