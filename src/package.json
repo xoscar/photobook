@@ -27,7 +27,7 @@
     "skipper-s3": "^0.5.9"
   },
   "scripts": {
-    "debug": "node debug app.js",
+    "debug": "node debug app.js"
   },
   "main": "app.js",
   "repository": {
