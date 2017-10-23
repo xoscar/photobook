@@ -3,6 +3,7 @@ web:
   ports:
     - '3000:3000'
   working_dir: /usr/src/app
+  command: npm start
   volumes:
     - ./:/usr/src/app
   links:
