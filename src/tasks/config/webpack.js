@@ -1,5 +1,10 @@
 const webpackConfig = require('../../webpack.config');
 
+/**
+ * Webpack task to compile the javascript frontend webapp
+ * @param  {Object} grunt Default grunt object
+ * @return {void}       Adds task config for wepack and attaches it to grunt.
+ */
 module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-webpack');
 

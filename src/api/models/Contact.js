@@ -1,3 +1,7 @@
+/**
+ * Contact model description
+ * @type {Object} returns object with specific attributes and methods.
+ */
 module.exports = {
   attributes: {
     name: {
@@ -20,6 +24,8 @@ module.exports = {
     },
     imageUrl: {
       type: 'string',
+
+      // use default image for contacts without a defined image.
       defaultsTo: 'https://s3-us-west-2.amazonaws.com/photobook-images-test-2/default.png',
     },
   },

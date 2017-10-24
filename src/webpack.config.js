@@ -1,6 +1,10 @@
 const { join } = require('path');
 const webpack = require('webpack');
 
+/**
+ * Webpack configuration for webapp frontend config
+ * @type {Object}
+ */
 module.exports = {
   context: join(__dirname),
   entry: './assets/js/app/app.js',
@@ -34,7 +38,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('test'),
+      'process.env.NODE_ENV': JSON.stringify('development'),
     }),
   ],
 };

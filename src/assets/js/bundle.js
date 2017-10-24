@@ -196,6 +196,14 @@ function appendContextPath(contextPath, id) {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// Create a simple path alias to allow browserify to resolve
+// the runtime on a supported path.
+module.exports = __webpack_require__(9)['default'];
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -252,14 +260,6 @@ exports['default'] = Exception;
 module.exports = exports['default'];
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Create a simple path alias to allow browserify to resolve
-// the runtime on a supported path.
-module.exports = __webpack_require__(9)['default'];
-
-/***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -268,7 +268,8 @@ module.exports = __webpack_require__(9)['default'];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contactListTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__contactListTemplate_hbs__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contactCard__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__contactModal__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_rest__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__deleteContact__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_rest__ = __webpack_require__(4);
 // template
 
 
@@ -276,40 +277,52 @@ module.exports = __webpack_require__(9)['default'];
 
 
 
+
 // lib
 
 
+/**
+ * Contact list component
+ */
 /* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Retrieves all contacts from the API REST service
+   * @return {Promise} Async result with contact list or error
+   */
   getContacts() {
-    return Object(__WEBPACK_IMPORTED_MODULE_3__lib_rest__["a" /* default */])({
+    return Object(__WEBPACK_IMPORTED_MODULE_4__lib_rest__["a" /* default */])({
       path: '/contacts'
     });
   },
 
-  deleteContact(contactId) {
-    return Object(__WEBPACK_IMPORTED_MODULE_3__lib_rest__["a" /* default */])({
-      path: `/contacts/${contactId}`,
-      method: 'DELETE'
-    });
-  },
-
+  /**
+   * Retrieves the contacts, displays them into the view and creates listeners for the actions.
+   * @return {void} Prints the result directly into the view.
+   */
   render() {
+    // step #1: get list of contacts from the backend.
     this.getContacts().then(({ contacts, hits }) => {
+      // step #2: render contact component list into the view.
       $('#contacts').html(__WEBPACK_IMPORTED_MODULE_0__contactListTemplate_hbs___default()({
-        contacts: contacts.map((contact, index) => __WEBPACK_IMPORTED_MODULE_1__contactCard__["a" /* default */].render({ contact })).join('')
+        contacts: contacts.map((contact, index) =>
+        // contact card component
+        __WEBPACK_IMPORTED_MODULE_1__contactCard__["a" /* default */].render({ contact })).join('')
       }));
 
+      // step #3: creates listener for view detail modal
       $('.detail-view-button').on('click', event => {
         const contactId = $(event.target).data('contactid');
 
+        // renders modal component view into the contact list template placeholder with the specific info for the contact
         $('#contactModal').html(__WEBPACK_IMPORTED_MODULE_2__contactModal__["a" /* default */].render({ contact: contacts.filter(contact => contact.id === contactId)[0] }));
         $('#exampleModal').modal('show');
       });
 
+      // step #4: creates listener for delete contact modal
       $('.delete-contact').on('click', event => {
         const contactId = $(event.target).data('contactid');
 
-        this.deleteContact(contactId).then(() => this.render());
+        __WEBPACK_IMPORTED_MODULE_3__deleteContact__["a" /* default */].render({ contact: contacts.filter(contact => contact.id === contactId)[0], onDelete: this.render.bind(this) });
       });
     });
   }
@@ -317,6 +330,57 @@ module.exports = __webpack_require__(9)['default'];
 
 /***/ }),
 /* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+// dependencies
+
+
+/**
+ * Send a request to the backend using the given parameters
+ * @param  {String} options.path   Requested path of the service
+ * @param  {String} options.method HTTP Verb
+ * @param  {Object} options.data   Body request
+ * @param  {Object} options.       Object with the request parameters
+ * @return {Promise}               Returns a promise where that resolves when sucessfull and rejects on fail
+ */
+/* harmony default export */ __webpack_exports__["a"] = (({
+  path,
+  method = 'GET',
+  data = null
+}) => __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.ajax({
+  method,
+  url: path,
+  headers: {
+    'Content-type': 'application/json'
+  },
+  data: data ? JSON.stringify(data) : null
+}));
+
+/**
+ * Send upload file request using the request parameters
+ * @param  {String} options.path      Requested path of the service
+ * @param  {String} options.method    HTTP Verb
+ * @param  {FormData} options.formData  A form data object containing the files
+ * @param  {Object} options.          Object with the request parameters
+ * @return {Promise}               Returns a promise where that resolves when sucessfull and rejects on fail
+ */
+const fileUpload = ({ formData, method = 'POST', path }) => __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.ajax({
+  url: path,
+  method,
+  data: formData,
+  cache: false,
+  dataType: 'json',
+  processData: false,
+  contentType: false
+});
+/* harmony export (immutable) */ __webpack_exports__["b"] = fileUpload;
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -332,7 +396,7 @@ function _interopRequireDefault(obj) {
 
 var _utils = __webpack_require__(0);
 
-var _exception = __webpack_require__(1);
+var _exception = __webpack_require__(2);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -427,49 +491,6 @@ exports.createFrame = _utils.createFrame;
 exports.logger = _logger2['default'];
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-// dependencies
-
-
-const baseUrl = 'http://localhost:3000';
-
-/* harmony default export */ __webpack_exports__["a"] = (({
-  path,
-  method = 'GET',
-  data = null
-}) => {
-  console.log('sending request', path, data);
-
-  return __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.ajax({
-    method,
-    url: `${baseUrl}${path}`,
-    headers: {
-      'Content-type': 'application/json'
-    },
-    data: data ? JSON.stringify(data) : null
-  });
-});
-
-const fileUpload = ({ formData, method = 'POST', path }) => {
-  return __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.ajax({
-    url: `${baseUrl}${path}`,
-    method: 'POST',
-    data: formData,
-    cache: false,
-    dataType: 'json',
-    processData: false,
-    contentType: false
-  });
-};
-/* harmony export (immutable) */ __webpack_exports__["b"] = fileUpload;
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -478,8 +499,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_bootstrap_dist_js_bootstrap_min_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_bootstrap_dist_js_bootstrap_min_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__node_modules_bootstrap_dist_js_bootstrap_min_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_contactList__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_newContact__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__styles_main_scss__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_newContact__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__styles_main_scss__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__styles_main_scss___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__styles_main_scss__);
 // dpendencies
 
@@ -491,9 +512,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // styles
 
 
+/**
+ * When document ready, contact list and ne contact componets are rendered
+ */
 $(document).ready(() => {
-	__WEBPACK_IMPORTED_MODULE_1__components_contactList__["a" /* default */].render();
-	__WEBPACK_IMPORTED_MODULE_2__components_newContact__["a" /* default */].render();
+  __WEBPACK_IMPORTED_MODULE_1__components_contactList__["a" /* default */].render();
+  __WEBPACK_IMPORTED_MODULE_2__components_newContact__["a" /* default */].render();
 });
 
 /***/ }),
@@ -1377,12 +1401,12 @@ var bootstrap = function (t, e, n) {
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(2);
+var Handlebars = __webpack_require__(1);
 module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper;
 
   return ((stack1 = ((helper = (helper = helpers.contacts || (depth0 != null ? depth0.contacts : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"contacts","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\n\n<div id=\"contactModal\"></div>";
+    + "\n\n<div id=\"contactModal\"></div>\n<div id=\"deleteModal\"></div>";
 },"useData":true});
 
 /***/ }),
@@ -1413,7 +1437,7 @@ function _interopRequireWildcard(obj) {
   }
 }
 
-var _handlebarsBase = __webpack_require__(4);
+var _handlebarsBase = __webpack_require__(5);
 
 var base = _interopRequireWildcard(_handlebarsBase);
 
@@ -1424,7 +1448,7 @@ var _handlebarsSafeString = __webpack_require__(21);
 
 var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-var _handlebarsException = __webpack_require__(1);
+var _handlebarsException = __webpack_require__(2);
 
 var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
@@ -1581,7 +1605,7 @@ function _interopRequireDefault(obj) {
 
 var _utils = __webpack_require__(0);
 
-var _exception = __webpack_require__(1);
+var _exception = __webpack_require__(2);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -1680,7 +1704,7 @@ function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { 'default': obj };
 }
 
-var _exception = __webpack_require__(1);
+var _exception = __webpack_require__(2);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -1985,11 +2009,11 @@ var _utils = __webpack_require__(0);
 
 var Utils = _interopRequireWildcard(_utils);
 
-var _exception = __webpack_require__(1);
+var _exception = __webpack_require__(2);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _base = __webpack_require__(4);
+var _base = __webpack_require__(5);
 
 function checkRevision(compilerInfo) {
   var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -2329,11 +2353,20 @@ module.exports = g;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contactCardTemplate_hbs__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contactCardTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__contactCardTemplate_hbs__);
+// template
 
 
+/**
+ * Contact card component
+ */
 /* harmony default export */ __webpack_exports__["a"] = ({
-  render({ contact, key, onDetailView }) {
-    return __WEBPACK_IMPORTED_MODULE_0__contactCardTemplate_hbs___default()({ contact, key });
+  /**
+   * Compiles hbs template using the contact info
+   * @param  {Object} options.contact      Contact model information
+   * @return {String}                      Returns compiled string with contacts information
+   */
+  render({ contact }) {
+    return __WEBPACK_IMPORTED_MODULE_0__contactCardTemplate_hbs___default()({ contact });
   }
 });
 
@@ -2341,15 +2374,15 @@ module.exports = g;
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(2);
+var Handlebars = __webpack_require__(1);
 module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12 mb-5\">\n	<div class=\"card\">\n	  <img class=\"card-img-top\" src=\""
+  return "<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12 mb-5\">\n	<div class=\"card\" style=\"height: 22.5rem\">\n	  <img class=\"card-img-top\" src=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.contact : depth0)) != null ? stack1.imageUrl : stack1), depth0))
-    + "\" alt=\"Card image cap\">\n	  <div class=\"card-body\">\n	    <h4 class=\"card-title\">"
+    + "\" alt=\"Card image cap\" style=\"height: 10rem\">\n	  <div class=\"card-body\">\n	    <h4 class=\"card-title\">"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.contact : depth0)) != null ? stack1.name : stack1), depth0))
-    + "</h4>\n	    <p class=\"card-text\">Email: "
+    + "</h4>\n	    <p class=\"card-text\">"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.contact : depth0)) != null ? stack1.email : stack1), depth0))
     + "</p>\n	    <p class=\"card-text\">Phone: "
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.contact : depth0)) != null ? stack1.phone : stack1), depth0))
@@ -2367,11 +2400,19 @@ module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,"
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contactModalTemplate_hbs__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contactModalTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__contactModalTemplate_hbs__);
+// templates
 
 
+/**
+ * Detail modal view
+ */
 /* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Shows modal with the contact information
+   * @param  {Object} options.contact Contact model information
+   * @return {Stirng}                 Compiled handlebars template with contact info.
+   */
   render({ contact }) {
-    console.log(contact);
     return __WEBPACK_IMPORTED_MODULE_0__contactModalTemplate_hbs___default()({ contact });
   }
 });
@@ -2380,7 +2421,7 @@ module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,"
 /* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(2);
+var Handlebars = __webpack_require__(1);
 module.exports = (Handlebars['default'] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
 
@@ -2412,6 +2453,75 @@ module.exports = (Handlebars['default'] || Handlebars).template({"1":function(co
 
 /***/ }),
 /* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__deleteContactTemplate_hbs__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__deleteContactTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__deleteContactTemplate_hbs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_rest__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__contactList__ = __webpack_require__(3);
+// template
+
+
+// lib
+
+
+// components
+
+
+/**
+ * Contact list component
+ */
+/* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Deletes a selected contact
+   * @param  {Number} contactId Contact identifier
+   * @return {Promise}           Async result with the delete result coming from the backend
+   */
+  deleteContact(contactId) {
+    return Object(__WEBPACK_IMPORTED_MODULE_1__lib_rest__["a" /* default */])({
+      path: `/contacts/${contactId}`,
+      method: 'DELETE'
+    });
+  },
+
+  /**
+   * Displays delete modal for content
+   * @return {void} Prints the result directly into the view.
+   */
+  render({ contact, onDelete }) {
+    // Step #1: render modal with contact information
+    $('#deleteModal').html(__WEBPACK_IMPORTED_MODULE_0__deleteContactTemplate_hbs___default()({ contact }));
+
+    // Step #2: show modal
+    $('#delModal').modal('show');
+
+    // Step #3: create listeners for delete form
+    $('.delete-user-form').submit(event => {
+      event.preventDefault();
+
+      this.deleteContact(contact.id).then(() => {
+        $('#delModal').modal('hide').on('hidden.bs.modal', onDelete);
+      });
+    });
+  }
+});
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Handlebars = __webpack_require__(1);
+module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<div class=\"modal fade\" id=\"delModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"delModal\" aria-hidden=\"true\">\n	<div class=\"modal-dialog modal-lg\" role=\"document\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <h5 class=\"modal-title\" id=\"newModalLabel\">Confirmation alert</h5>\n        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n          <span class=\"pointer\" aria-hidden=\"true\">&times;</span>\n        </button>\n      </div>\n      <div class=\"modal-body\">\n      	Delete "
+    + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.contact : depth0)) != null ? stack1.name : stack1), depth0))
+    + " permanently?\n      </div>\n      <form class=\"delete-user-form\">\n	      <div class=\"modal-footer\">\n	        <button type=\"button\" class=\"btn pointer btn-secondary\" data-dismiss=\"modal\">Close</button>\n	        <button type=\"submit\" class=\"btn pointer btn-danger\">Sure</button>\n	      </div>\n      </form>\n  	</div>\n	</div>\n</div>";
+},"useData":true});
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -12241,82 +12351,163 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 });
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__newContactTemplate_hbs__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__newContactTemplate_hbs__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__newContactTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__newContactTemplate_hbs__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contactList__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_rest__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__validationError__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_rest__ = __webpack_require__(4);
 // template
 
 
 // components
 
 
+
 // lib
 
 
+/**
+ * New contact component
+ */
 /* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Send request to backend servie to create new contact
+   * @param  {Object} body New contact object information
+   * @return {Promise}      Async result from the service
+   */
   createContact(body) {
-    return Object(__WEBPACK_IMPORTED_MODULE_2__lib_rest__["a" /* default */])({
+    return Object(__WEBPACK_IMPORTED_MODULE_3__lib_rest__["a" /* default */])({
       path: '/contacts',
       data: body,
       method: 'POST'
     });
   },
 
+  /**
+   * Calls upload rest service from the backend to save contacts image
+   * @param  {Number} options.contactId contacts indentifier
+   * @param  {Object} options.file      File object from to upload.
+   * @return {Promise}                   Async result from the backend.
+   */
   uploadContactImage({ contactId, file }) {
+    // attach image to a form data
     const formData = new FormData();
-
     formData.append('image', file);
 
-    return Object(__WEBPACK_IMPORTED_MODULE_2__lib_rest__["b" /* fileUpload */])({
+    // trigger service call
+    return Object(__WEBPACK_IMPORTED_MODULE_3__lib_rest__["b" /* fileUpload */])({
       path: `/contacts/${contactId}/image`,
       formData
     });
   },
 
+  /**
+   * Compiles modal html to the view placeholder and creates listeners for the upload image and new contact events.
+   * @param  {Object} props Default optional properties send to the template 
+   * @return {void}       renders modal directly into the view.
+   */
   render(props) {
+    // Step #1: compile template and to show modal trigger and modal options
     $('#newContact').html(__WEBPACK_IMPORTED_MODULE_0__newContactTemplate_hbs___default()(props));
 
+    // Step #2: add listener to handle new contact action.
     $('.new-user-form').submit(event => {
       event.preventDefault();
 
+      // creates JSON body for basic contact information
       const body = $(event.target).serializeArray().reduce((acc, data) => Object.assign(acc, {
         [data.name]: data.value
       }), {});
 
+      // listener to remove validation alerts
+      $('.new-user-form').find('input[type=text], textarea, input[type=file], input[type=email]').change(() => $('#new-contact-validation-errors').html(''));
+
+      $('.close-new-modal').click(() => {
+        $('#new-contact-validation-errors').html('');
+        $('.new-user-form').find('input[type=text], textarea, input[type=file], input[type=email]').val('');
+      });
+
+      // sends create contact request to the backend
       this.createContact(body).then(({ contact }) => {
+        // from the just created contact we attach the image if it is defined in the form
         const image = $(event.target).find('input[type=file]')[0].files[0];
         return (image ? this.uploadContactImage({ file: image, contactId: contact.id }) : Promise.resolve()).then(() => {
+          // hide modal, clean form and re-render contact list component to update view.
           $('#newModal').modal('hide');
           $(event.target).find('input[type=text], textarea, input[type=file], input[type=email]').val('');
           __WEBPACK_IMPORTED_MODULE_1__contactList__["a" /* default */].render();
         });
-      }).catch(err => console.log(err));
+      })
+
+      // handle validation errors from the backend.
+      .catch(err => $('#new-contact-validation-errors').html(Object.keys(err.responseJSON).map(key => err.responseJSON[key].map(err => __WEBPACK_IMPORTED_MODULE_2__validationError__["a" /* default */].render({
+        field: key,
+        rule: err.rule
+      })).join('')).join('')));
     });
   }
 });
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(2);
+var Handlebars = __webpack_require__(1);
 module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<a class=\"btn btn-success new-contact-button pointer text-light\" data-toggle=\"modal\" data-target=\"#newModal\" role=\"button\" aria-pressed=\"true\">New</a>\n\n<div class=\"modal fade\" id=\"newModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"newModalLabel\" aria-hidden=\"true\">\n	<form class=\"new-user-form\">\n	  <div class=\"modal-dialog modal-lg\" role=\"document\">\n	    <div class=\"modal-content\">\n	      <div class=\"modal-header\">\n	        <h5 class=\"modal-title\" id=\"newModalLabel\">Contact detail view</h5>\n	        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n	          <span class=\"pointer\" aria-hidden=\"true\">&times;</span>\n	        </button>\n	      </div>\n	      <div class=\"modal-body\">\n	      	<div class=\"row text-left\">\n		        <div class=\"col-sm-12\">\n						  <div class=\"form-group\">\n						    <label for=\"name\">Name</label>\n						    <input type=\"text\" class=\"form-control\" id=\"name\" name=\"name\" placeholder=\"Enter name\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"email\">Email</label>\n						    <input type=\"email\" class=\"form-control\" id=\"email\" name=\"email\" placeholder=\"foo@bar.com\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"phone\">Phone</label>\n						    <input type=\"text\" class=\"form-control\" id=\"phone\" name=\"phone\" placeholder=\"+52 0123...\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"address\">Address</label>\n						    <textarea class=\"form-control\" id=\"address\" name=\"address\" rows=\"3\"></textarea>\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"details\">Details</label>\n						    <textarea class=\"form-control\" id=\"details\" name=\"details\" rows=\"3\"></textarea>\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"image\">Contact image</label>\n						    <input type=\"file\" class=\"form-control-file\" id=\"image\" name=\"image\">\n						  </div>\n						</div>\n					</div>\n	      </div>\n	      <div class=\"modal-footer\">\n	        <button type=\"button\" class=\"btn pointer btn-secondary\" data-dismiss=\"modal\">Close</button>\n	        <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n	      </div>\n    	</div>\n  	</div>\n  </form>\n</div>";
+    return "<a class=\"btn btn-success new-contact-button pointer text-light\" data-toggle=\"modal\" data-target=\"#newModal\" role=\"button\" aria-pressed=\"true\">New</a>\n\n<div class=\"modal fade\" id=\"newModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"newModalLabel\" aria-hidden=\"true\">\n	<form class=\"new-user-form\">\n	  <div class=\"modal-dialog modal-lg\" role=\"document\">\n	    <div class=\"modal-content\">\n	      <div class=\"modal-header\">\n	        <h5 class=\"modal-title\" id=\"newModalLabel\">Contact detail view</h5>\n	        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n	          <span class=\"pointer\" aria-hidden=\"true\">&times;</span>\n	        </button>\n	      </div>\n	      <div class=\"modal-body\">\n	      	<div class=\"row justify-content-center\">\n	      		<div class=\"col-sm-6\">\n	      			<div id=\"new-contact-validation-errors\"></div>\n	      		</div>\n	      	</div>\n	      	<div class=\"row text-left\">\n		        <div class=\"col-sm-12\">\n						  <div class=\"form-group\">\n						    <label for=\"name\">Name</label>\n						    <input type=\"text\" class=\"form-control\" id=\"name\" name=\"name\" placeholder=\"Enter name\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"email\">Email</label>\n						    <input type=\"email\" class=\"form-control\" id=\"email\" name=\"email\" placeholder=\"foo@bar.com\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"phone\">Phone</label>\n						    <input type=\"text\" class=\"form-control\" id=\"phone\" name=\"phone\" placeholder=\"+52 0123...\">\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"address\">Address</label>\n						    <textarea class=\"form-control\" id=\"address\" name=\"address\" rows=\"3\"></textarea>\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"details\">Details</label>\n						    <textarea class=\"form-control\" id=\"details\" name=\"details\" rows=\"3\"></textarea>\n						  </div>\n						  <div class=\"form-group\">\n						    <label for=\"image\">Contact image</label>\n						    <input type=\"file\" class=\"form-control-file\" id=\"image\" name=\"image\">\n						  </div>\n						</div>\n					</div>\n	      </div>\n	      <div class=\"modal-footer\">\n	        <button type=\"button\" class=\"btn pointer btn-secondary close-new-modal\" data-dismiss=\"modal\">Close</button>\n	        <button type=\"submit\" class=\"btn pointer btn-primary\">Add</button>\n	      </div>\n    	</div>\n  	</div>\n  </form>\n</div>";
 },"useData":true});
 
 /***/ }),
-/* 32 */
+/* 34 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__validationErrorTemplate_hbs__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__validationErrorTemplate_hbs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__validationErrorTemplate_hbs__);
+// template
+
+
+/**
+ * validation error component
+ */
+/* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Compiles hbs template using the contact info
+   * @param  {Object} options.contact      Contact model information
+   * @return {String}                      Returns compiled string with contacts information
+   */
+  render({ field, rule }) {
+    return __WEBPACK_IMPORTED_MODULE_0__validationErrorTemplate_hbs___default()({ field, rule });
+  }
+});
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Handlebars = __webpack_require__(1);
+module.exports = (Handlebars['default'] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "<div class=\"alert alert-danger\" role=\"alert\">\n  "
+    + alias4(((helper = (helper = helpers.field || (depth0 != null ? depth0.field : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"field","hash":{},"data":data}) : helper)))
+    + " is "
+    + alias4(((helper = (helper = helpers.rule || (depth0 != null ? depth0.rule : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"rule","hash":{},"data":data}) : helper)))
+    + "\n  <button type=\"button\" class=\"close pointer\" data-dismiss=\"alert\" aria-label=\"Close\">\n    <span aria-hidden=\"true\">&times;</span>\n  </button>\n</div>";
+},"useData":true});
+
+/***/ }),
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(33);
+var content = __webpack_require__(37);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -12324,7 +12515,7 @@ var transform;
 var options = {"hmr":true}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(35)(content, options);
+var update = __webpack_require__(39)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -12341,10 +12532,10 @@ if(false) {
 }
 
 /***/ }),
-/* 33 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(34)(undefined);
+exports = module.exports = __webpack_require__(38)(undefined);
 // imports
 exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900);", ""]);
 
@@ -12355,7 +12546,7 @@ exports.push([module.i, "/*!\n * Bootstrap v4.0.0-beta.2 (https://getbootstrap.c
 
 
 /***/ }),
-/* 34 */
+/* 38 */
 /***/ (function(module, exports) {
 
 /*
@@ -12434,7 +12625,7 @@ function toComment(sourceMap) {
 }
 
 /***/ }),
-/* 35 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -12490,7 +12681,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(36);
+var	fixUrls = __webpack_require__(40);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -12806,7 +12997,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 36 */
+/* 40 */
 /***/ (function(module, exports) {
 
 

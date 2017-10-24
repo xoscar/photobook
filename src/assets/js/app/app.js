@@ -8,6 +8,9 @@ import newContact from './components/newContact';
 // styles
 import '../../styles/main.scss';
 
+/**
+ * When document ready, contact list and ne contact componets are rendered
+ */
 $(document).ready(() => {
 	contactList.render();
 	newContact.render();

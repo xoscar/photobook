@@ -1,11 +1,6 @@
-const { join } = require('path');
-
-require('dotenv').config({
-  path: join(__dirname, '../../.env'),
-});
-
 module.exports = {
   models: {
+  	// set remote mysql instance for prod, to use RDS options
     connection: 'remoteMysql',
   },
 

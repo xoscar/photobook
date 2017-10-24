@@ -17,7 +17,13 @@
  * The same command-line arguments are supported, e.g.:
  * `node app.js --silent --port=80 --prod`
  */
+const { join } = require('path');
 
+if (process.env.NODE_ENV === 'production') {
+  require('dotenv').config({
+    path: join(__dirname, './.env'),
+  });
+}
 
 // Ensure we're in the project directory, so cwd-relative paths work as expected
 // no matter where we actually lift from.
@@ -54,7 +60,6 @@ try {
     rc = function () { return {}; };
   }
 }
-
 
 // Start server
 sails.lift(rc('sails'));

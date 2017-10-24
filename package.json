@@ -4,7 +4,6 @@
   "description": "test phonebook",
   "main": "src/index.js",
   "scripts": {
-    "test": "npm t",
     "start": "sh tools/start.sh"
   },
   "repository": {
