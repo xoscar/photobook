@@ -2,3 +2,12 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
 
 .pointer { cursor: pointer }
+
+.truncate {
+  width: 216px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-text { font-size: .8rem }

@@ -1,4 +1,4 @@
-echo 'instaling global dependencies';
+echo 'installing global dependencies';
 yarn global add pm2 grunt sails
 
 echo 'instaling dependencies';
