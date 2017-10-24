@@ -1,6 +1,6 @@
 module.exports = {
   models: {
-  	// set remote mysql instance for prod, to use RDS options
+    // set remote mysql instance for prod, to use RDS options
     connection: 'remoteMysql',
   },
 

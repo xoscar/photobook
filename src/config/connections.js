@@ -18,6 +18,6 @@ module.exports.connections = {
     user: 'root',
     password: process.env.MYSQL_PASSWORD,
     host: process.env.MYSQL_HOST,
-    database: 'phonebook',
+    database: 'photobook',
   },
 };
