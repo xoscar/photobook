@@ -1,3 +1,6 @@
+echo 'installing yarn';
+npm i yarn -g
+
 echo 'installing global dependencies';
 yarn global add pm2 grunt sails
 

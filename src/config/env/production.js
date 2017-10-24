@@ -4,6 +4,7 @@ module.exports = {
     connection: 'remoteMysql',
   },
 
+  hookTimeout: 30000,
   port: 80,
   appName: 'Phone Book',
 };
