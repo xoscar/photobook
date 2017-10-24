@@ -1,10 +1,10 @@
-echo `instaling global dependencies`;
+echo 'instaling global dependencies';
 yarn global add pm2 grunt sails
 
-echo `instaling dependencies`;
+echo 'instaling dependencies';
 
 cd src && yarn;
 
-echo `starting server`;
+echo 'starting server';
 
 pm2 start app.js
