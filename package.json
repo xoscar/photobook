@@ -4,7 +4,8 @@
   "description": "test phonebook",
   "main": "src/index.js",
   "scripts": {
-    "start": "sh tools/start.sh"
+    "start": "sh tools/start.sh",
+    "test": "cd src && grunt test"
   },
   "repository": {
     "type": "git",

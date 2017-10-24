@@ -36,6 +36,7 @@ To start the application in developer mode this are the steps:
       ```
   - Run `docker-compose up`  or `docker-compose run --service-ports web bash` in the root folder.
   - In case of using `docker-compose run` you must call `npm start` manually and dependencies will be installed and the application will start on port `3000`
+  - To run tests use `npm test` inside the root folder.
 
 ### For production
 
@@ -45,6 +46,6 @@ NOTE: by default Sails.js has a safety migrate for production environment, this 
 ***
 ### Contact
 
-For any questions or concers regarding this application please contact me at: oscar-rreyes1@hotmail.com
+For any questions or concers about this application please contact me at: oscar-rreyes1@hotmail.com
 
 # Happy Coding!
